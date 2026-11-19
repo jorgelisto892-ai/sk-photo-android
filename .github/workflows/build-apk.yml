@@ -1,0 +1,71 @@
+# Construye el APK de prueba de SK Photo en los servidores de GitHub.
+# Corre solo cada vez que subes cambios, o a mano desde la pestaña Actions.
+name: Construir APK
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el proyecto
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Instalar Capacitor
+        run: npm install
+
+      - name: Crear el proyecto Android
+        run: npx cap add android
+
+      - name: Ícono y pantalla de inicio
+        continue-on-error: true
+        run: npx @capacitor/assets generate --android --iconBackgroundColor "#131211" --iconBackgroundColorDark "#131211" --splashBackgroundColor "#131211" --splashBackgroundColorDark "#131211"
+
+      - name: Copiar la app al proyecto Android
+        run: npx cap sync android
+
+      # Siempre la misma firma de prueba, para que cada versión nueva se instale encima de la anterior.
+      - name: Usar la firma de prueba
+        run: |
+          mkdir -p ~/.android
+          cp keystore/debug.keystore ~/.android/debug.keystore
+
+      - name: Compilar el APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Nombrar el APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk SK-Photo.apk
+
+      - name: Guardar el APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SK-Photo-apk
+          path: SK-Photo.apk
+
+      - name: Publicar la descarga en Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "prueba-${{ github.run_number }}" SK-Photo.apk \
+            --title "SK Photo, prueba ${{ github.run_number }}" \
+            --notes "APK de prueba. Ábrelo desde el teléfono para instalarlo." \
+            --latest

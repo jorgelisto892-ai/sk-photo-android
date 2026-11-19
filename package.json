@@ -1,0 +1,20 @@
+{
+  "name": "sk-photo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SK Photo: editor de fotos y collage para Android",
+  "scripts": {
+    "android": "cap add android && npx @capacitor/assets generate --android --iconBackgroundColor \"#131211\" --iconBackgroundColorDark \"#131211\" --splashBackgroundColor \"#131211\" --splashBackgroundColorDark \"#131211\" && cap sync android",
+    "sync": "cap sync android",
+    "open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/filesystem": "^8.0.0",
+    "@capacitor/share": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0"
+  }
+}

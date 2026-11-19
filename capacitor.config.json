@@ -1,0 +1,14 @@
+{
+  "appId": "com.skphoto.editor",
+  "appName": "SK Photo",
+  "webDir": "www",
+  "backgroundColor": "#131211",
+  "android": {
+    "backgroundColor": "#131211"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css"
+    }
+  }
+}
